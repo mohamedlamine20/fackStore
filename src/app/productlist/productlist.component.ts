@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../service/product.service';
 import { Product } from '../model/product';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-productlist',
@@ -9,22 +10,28 @@ import { Router } from '@angular/router';
   styleUrls: ['./productlist.component.css']
 })
 export class ProductlistComponent implements  OnInit {
-  products:Product[]=[];
+  products!:Observable<Product[]>;
 
-  constructor(private productService:ProductService,private route:Router){
+  constructor(private productService:ProductService,private route:Router,private activeRoute:ActivatedRoute){
 
   }
   ngOnInit(): void {
-    this.productService.getAllProducts().subscribe(
-      {
-        next:(res)=>this.products=res,
-        error:(error)=>console.error(error)
-      }
-    )
-    
+  this.productService.categorySubject.subscribe(
+    {
+      next:res=>this.leadProducts(res),
+
+    }
+  )
+  this.productService.emitCategory(this.activeRoute.snapshot.params['category']);
+ 
   }
   onClick(product:Product){
     this.route.navigateByUrl(`product/${product.id}`)
+    
 
+  }
+
+  leadProducts(category:string){
+    this.products = this.productService.getProductsByCategories(category)
   }
 }

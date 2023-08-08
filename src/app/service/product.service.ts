@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Product } from '../model/product';
 
 @Injectable({
@@ -22,8 +22,13 @@ export class ProductService {
     return this.http.get<string[]>(`${this.url}/categories`)
   }
 
-  getProductsByCategories(category:string):Observable<Product>{
-    return this.http.get<Product>(`${this.url}/category/${category}`)
+  getProductsByCategories(category:string):Observable<Product[]>{
+    return this.http.get<Product[]>(`${this.url}/category/${category}`)
+  }
+  categorySubject = new Subject<string>()
+  emitCategory(value:string){
+    this.categorySubject.next(value);
+
   }
  
    
